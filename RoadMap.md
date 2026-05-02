@@ -1,4 +1,4 @@
-# 🗺️ [nombre_proyecto]: Roadmap de Ingeniería
+# 🗺️ CyberGuardArch: Roadmap de Ingeniería
 
 Este documento detalla las fases de desarrollo, requisitos técnicos y el estado de los componentes del sistema de monitoreo industrial.
 

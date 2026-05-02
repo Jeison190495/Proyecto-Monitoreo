@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CyberGuardArch.Core/CyberGuardArch.Core.csproj" />
+    <Project Path="src/CyberGuardArch.Infrastructure/CyberGuardArch.Infrastructure.csproj" />
+    <Project Path="src/CyberGuardArch.Worker/CyberGuardArch.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CyberGuardArch.Tests/CyberGuardArch.Tests.csproj" />
+  </Folder>
+</Solution>

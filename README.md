@@ -1,7 +1,7 @@
-# 🛡️ [ Nombre Proyecto ]
+# 🛡️ CyberGuardArch
 **Sistema de Monitoreo Proactivo e Inteligente para Entornos de Ingeniería.**
 
-[Nombre Proyecto] es un servicio de monitoreo industrial diseñado para la supervisión en tiempo real de cambios críticos en red y sistema de archivos. Construido sobre **.NET 10** y optimizado inicialmente para **Arch Linux**, utiliza una arquitectura desacoplada que permite la escalabilidad hacia Windows y plataformas Cloud.
+CyberGuardArch es un servicio de monitoreo industrial diseñado para la supervisión en tiempo real de cambios críticos en red y sistema de archivos. Construido sobre **.NET 10** y optimizado inicialmente para **Arch Linux**, utiliza una arquitectura desacoplada que permite la escalabilidad hacia Windows y plataformas Cloud.
 
 ## 🚀 Propósito
 Proporcionar una capa de seguridad y auditoría forense para desarrolladores, notificando de forma inmediata via **Telegram** sobre:
