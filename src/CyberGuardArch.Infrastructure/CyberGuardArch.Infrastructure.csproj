@@ -4,6 +4,10 @@
     <ProjectReference Include="..\CyberGuardArch.Core\CyberGuardArch.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Telegram.Bot" Version="22.9.6.2" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
