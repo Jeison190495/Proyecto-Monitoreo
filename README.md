@@ -22,5 +22,21 @@ El proyecto se divide en tres capas fundamentales:
 2. **Infrastructure:** Implementaciones de bajo nivel (sensores Linux y API de Telegram).
 3. **Worker:** El daemon que orquesta el servicio en segundo plano.
 
+## 🛠️ Configuración del Bot de Telegram
+
+Para que el sistema funcione, necesitas configurar un bot con **BotFather**:
+
+1. Crea un bot y obtén el `Token`.
+2. Obtén tu `ChatId` (puedes usar el comando `curl` mencionado en la documentación técnica).
+3. Configura el nombre del bot en el sistema.
+
+### 🔐 Gestión de Secretos (Local)
+Para evitar subir credenciales a GitHub, usamos **.NET User Secrets**. Ejecuta los siguientes comandos en la carpeta `src/CyberGuardArch.Worker`:
+```bash
+dotnet user-secrets init
+dotnet user-secrets set "Telegram:Token" "TU_TOKEN_AQUI"
+dotnet user-secrets set "Telegram:ChatId" "TU_ID_AQUI"
+dotnet user-secrets set "Telegram:NameBot" "NOMBRE_DE_TU_BOT"
+
 ## 🔧 Instalación y Desarrollo (Próximamente)
 *En desarrollo. Consulte el archivo ROADMAP.md para seguir el progreso.*
