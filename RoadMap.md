@@ -15,13 +15,13 @@ Este documento detalla las fases de desarrollo, requisitos técnicos y el estado
 
 ### 🔐 Protocolo de Seguridad e Integridad (Cybersecurity Layer)
 - [ x ] **Gestión de Secretos:** Implementación de `UserSecrets` para desarrollo y variables de entorno para producción (Prohibido Hardcoding de Tokens).
-- [  ] **Validación de Integridad de Logs:** Diseño de una firma simple para los logs, evitando que un atacante borre huellas de archivos modificados.
+- [ x ] **Validación de Integridad de Logs:** Diseño de una firma simple para los logs, evitando que un atacante borre huellas de archivos modificados.
 - [ ] **Principio de Menor Privilegio:** Definición de permisos mínimos necesarios para que el binario de .NET acceda a `nmcli` y al sistema de archivos sin ser `root` innecesariamente.
 
 ### 📜 Definición de Contratos (Interfaces Core)
 - [ x ] **`IMonitorService`:** Interfaz para sensores de Red y Archivos. Debe soportar cancelación asíncrona (`CancellationToken`).
 - [ x ] **`INotificationService`:** Interfaz para servicios de alerta (Telegram, Desktop Notifier).
-- [ ] **`IFileSystemWatcher`:** Abstracción para evitar dependencia directa de `System.IO.FileSystemWatcher` y permitir testing con mocks.
+- [ x ] **`IFileSystemWatcher`:** Abstracción para evitar dependencia directa de `System.IO.FileSystemWatcher` y permitir testing con mocks.
 
 ### 🔧 Gestión de Configuración y DevOps (Git & Workflow)
 - [ x ] **Estructura de Repositorio Profesional:**

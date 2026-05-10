@@ -39,19 +39,19 @@ dotnet user-secrets set "Telegram:ChatId" "TU_ID_AQUI"
 dotnet user-secrets set "Telegram:NameBot" "NOMBRE_DE_TU_BOT"
 ```
 
-## 📈 Estado Actual del Desarrollo
-Actualmente el proyecto se encuentra en la **Fase 2**. 
+## 📈 Estado Actual del Proyecto
+Actualmente, el sistema ha completado su **Base Forense (Fase 0)** y su **Primer Módulo de Monitoreo (Fase 2)**.
 
 ### ✅ Funcionalidades Operativas:
-- **Notificaciones:** Integración completa con Telegram. El sistema notifica el inicio de sesión y la máquina origen.
-- **Monitoreo de Archivos:** Sensor recursivo funcional. Detecta y reporta en tiempo real:
-    - `CREADO`: Nuevos archivos o carpetas.
-    - `MODIFICADO`: Cambios en contenido o metadatos.
-    - `ELIMINADO`: Borrado de archivos o directorios (incluyendo recursión).
-- **Calidad:** Suite de pruebas unitarias con **xUnit** y **Moq** integrada en el flujo de trabajo.
+- **Monitoreo de Archivos:** Sensor recursivo que detecta `CREADO`, `MODIFICADO` y `ELIMINADO` en tiempo real.
+- **Notificaciones:** Integración con Telegram Bot API para alertas instantáneas.
+- **Auditoría Forense (Logging):** 
+    - **Humana:** Logs limpios en consola con timestamps locales.
+    - **Máquina:** Logs estructurados en **JSON (formato CLEF)** para futura integración con Dashboards, garantizando persistencia inmediata (`buffered: false`).
+- **Calidad de Software:** Suite de pruebas unitarias con **xUnit** y **Moq** (4/4 tests exitosos).
 
-### 🧪 Ejecución de Pruebas
-Para validar la integridad del sistema en tu entorno de desarrollo, ejecuta:
+## 🧪 Pruebas del Sistema
+Para validar la integridad de todos los módulos, ejecuta:
 ```bash
 dotnet test
 ```
