@@ -26,7 +26,7 @@ Este documento detalla las fases de desarrollo, requisitos técnicos y el estado
 ### 🔧 Gestión de Configuración y DevOps (Git & Workflow)
 - [ x ] **Estructura de Repositorio Profesional:**
     - [ x ] Creación de `.gitignore` optimizado para .NET.
-- [ ] **Estrategia de Versionamiento:** Establecer ramas `main` y `develop` con GitFlow simplificado.
+- [ x ] **Estrategia de Versionamiento:** Establecer ramas `main` y `develop` con GitFlow simplificado.
 
 ---
 
@@ -37,7 +37,7 @@ Este documento detalla las fases de desarrollo, requisitos técnicos y el estado
 - [ x ] Creación de Bot mediante BotFather (Documentar proceso).
 - [ x ] Implementación de `TelegramService` en C#.
 - [ x ] **Pruebas de Conectividad:** Script de validación mediante `curl` y prueba unitaria en .NET.
-
+- [ x ] Envio de mensaje de bienvenida  desde el servicio notification
 ---
 
 ## 🐧 Fase 2: Módulos de Monitoreo (Enfoque Arch Linux)

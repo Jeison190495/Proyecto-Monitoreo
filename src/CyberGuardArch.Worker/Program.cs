@@ -8,7 +8,8 @@ var builder = Host.CreateApplicationBuilder(args);
 builder.Services.Configure<TelegramOptions>(builder.Configuration.GetSection(TelegramOptions.SectionName));
 builder.Services.AddSingleton<INotificationService, TelegramNotificationService>();
 
-builder.Services.AddHostedService<Worker>();
+builder.Services.AddHostedService<CyberGuardArchWorker>();
+builder.Services.AddSingleton<IFileMonitorService, LinuxFileMonitorService>();
 
 var host = builder.Build();
 host.Run();
