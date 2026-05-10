@@ -37,6 +37,21 @@ dotnet user-secrets init
 dotnet user-secrets set "Telegram:Token" "TU_TOKEN_AQUI"
 dotnet user-secrets set "Telegram:ChatId" "TU_ID_AQUI"
 dotnet user-secrets set "Telegram:NameBot" "NOMBRE_DE_TU_BOT"
+```
 
-## 🔧 Instalación y Desarrollo (Próximamente)
-*En desarrollo. Consulte el archivo ROADMAP.md para seguir el progreso.*
+## 📈 Estado Actual del Desarrollo
+Actualmente el proyecto se encuentra en la **Fase 2**. 
+
+### ✅ Funcionalidades Operativas:
+- **Notificaciones:** Integración completa con Telegram. El sistema notifica el inicio de sesión y la máquina origen.
+- **Monitoreo de Archivos:** Sensor recursivo funcional. Detecta y reporta en tiempo real:
+    - `CREADO`: Nuevos archivos o carpetas.
+    - `MODIFICADO`: Cambios en contenido o metadatos.
+    - `ELIMINADO`: Borrado de archivos o directorios (incluyendo recursión).
+- **Calidad:** Suite de pruebas unitarias con **xUnit** y **Moq** integrada en el flujo de trabajo.
+
+### 🧪 Ejecución de Pruebas
+Para validar la integridad del sistema en tu entorno de desarrollo, ejecuta:
+```bash
+dotnet test
+```

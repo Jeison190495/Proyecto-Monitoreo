@@ -25,7 +25,7 @@ Este documento detalla las fases de desarrollo, requisitos técnicos y el estado
 
 ### 🔧 Gestión de Configuración y DevOps (Git & Workflow)
 - [ x ] **Estructura de Repositorio Profesional:**
-    - [ x ] Creación de `.gitignore` optimizado para .NET.
+- [ x ] Creación de `.gitignore` optimizado para .NET.
 - [ x ] **Estrategia de Versionamiento:** Establecer ramas `main` y `develop` con GitFlow simplificado.
 
 ---
@@ -46,9 +46,9 @@ Este documento detalla las fases de desarrollo, requisitos técnicos y el estado
 ### [ ] Sensor de Red (Network Sensor)
 - [ ] Captura de eventos mediante `nmcli` o lectura de `/proc/net/`.
 - [ ] Extracción de metadatos: IP, SSID, Marca de tiempo.
-### [ ] Sensor de Sistema de Archivos (Watcher)
-- [ ] Monitoreo de directorios clave mediante `FileSystemWatcher` optimizado para Linux.
-- [ ] Detección de: Creación, Modificación, Eliminación.
+### [ x ] Sensor de Sistema de Archivos (Watcher)
+- [ x ] Monitoreo de directorios clave mediante `FileSystemWatcher` optimizado para Linux.
+- [ x ] Detección de: Creación, Modificación, Eliminación.
 ### [ ] Interfaz de Usuario Local
 - [ ] Alertas visuales usando `notify-send` / `Zenity`.
 
@@ -58,6 +58,9 @@ Este documento detalla las fases de desarrollo, requisitos técnicos y el estado
 - [ ] **Logging Industrial:** Implementación de logs estructurados en JSON para fácil parsing.
 - [ ] **Daemonization:** Creación del archivo de unidad de `systemd` para que SentinelArch inicie con el sistema.
 - [ ] **Suite de Pruebas:** Cobertura de tests unitarios (XUnit) mínima del 80%.
+   - [x] **Lógica de Negocio:** Test de `CyberGuardArchWorker` (Validación de secretos/tokens).
+   - [x] **Integración Lógica:** Test de flujo sensor -> notificador (Mocking de eventos).
+   - [x] **Cobertura Inicial:** 4/4 Tests exitosos en .NET 10.
 
 ---
 

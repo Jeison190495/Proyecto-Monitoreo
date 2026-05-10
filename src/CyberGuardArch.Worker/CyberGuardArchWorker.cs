@@ -30,24 +30,30 @@ IFileMonitorService fileMonitorService) : BackgroundService
             return;
         }
 
-        fileMonitorService.OnFileChanged += async(tipo, ruta) =>
+        fileMonitorService.OnFileChanged += async (tipo, ruta) =>
         {
+            // Loguear el cambio detectado en plantilla de log sin interpolación para mejor rendimiento
+            logger.LogWarning("Cambio detectado Tipo: {Tipo} ,Ruta: {Ruta}, Usuario: {User}, Sistema: {Host}",
+                        tipo,
+                        ruta,
+                        Environment.UserName,
+                        Environment.MachineName);
+            
+            //mensaje de notificación con formato limpio y claro para Telegram
             string mensajenotificacion = $"Alerta de seguridad:\n" +
-                                     $"Accion: {tipo}\n" +
-                                     $"Ruta del archivo: {ruta}\n" +
-                                     $"Sistema: {Environment.MachineName}\n" +
-                                     $"Hora: {DateTime.Now}";
+                                     $"\tAccion: {tipo}\n" +
+                                     $"\tRuta del archivo: {ruta}\n" +
+                                     $"\tSistema: {Environment.MachineName}\n" +
+                                     $"\tHora: {DateTime.Now}";
 
-            logger.LogWarning($"Cambio detectado: {tipo} en {ruta}");
-
+            // Enviar la notificación a Telegram
             await notificationService.SendNotificationAsync(mensajenotificacion, stoppingToken);
         };
 
-        // 3. Iniciar el monitoreo en tu carpeta de laboratorio
-        // Cambia "tu_usuario" por tu nombre de usuario real en Arch
-        string rutaLaboratorio = $"/home/jeison/CyberGuard_Lab"; 
-        
-        try 
+        // prueba monitoreo a carpeta y subcarpetas
+        string rutaLaboratorio = $"/home/jeison/CyberGuard_Lab";
+
+        try
         {
             fileMonitorService.StartMonitoring(rutaLaboratorio);
             logger.LogInformation($"Vigilando la carpeta: {rutaLaboratorio}");
@@ -60,28 +66,10 @@ IFileMonitorService fileMonitorService) : BackgroundService
 
         // 4. Mantener el servicio vivo
         await notificationService.SendNotificationAsync($"🛡️ {_options.NameBot} monitoreando archivos...", stoppingToken);
-        
+
         while (!stoppingToken.IsCancellationRequested)
         {
             await Task.Delay(1000, stoppingToken);
-        }
-
-        /*logger.LogInformation($"Worker iniciado con Telegram Token: {_options.Token}, ChatId: {_options.ChatId}, Nombre: {_options.NameBot}");
-
-        try
-        {
-            await notificationService.SendNotificationAsync(
-                $"🚀 {_options.NameBot} en línea! Sistema: {Environment.MachineName}",
-                stoppingToken);
-            logger.LogInformation("Mensaje de bienvenida enviado a Telegram.");
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error al enviar el mensaje inicial.");
-        }*/
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            await Task.Delay(10000, stoppingToken);
         }
     }
 }

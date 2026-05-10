@@ -22,7 +22,7 @@ public class LinuxFileMonitorService : IFileMonitorService, IDisposable
             EnableRaisingEvents = true
         };
 
-        // Suscribimos a los eventos nativos
+        // Suscribimos a los eventos de creación, modificación y eliminación de archivos
         _watcher.Created += (s, e) => OnFileChanged?.Invoke("CREADO", e.FullPath);
         _watcher.Changed += (s, e) => OnFileChanged?.Invoke("MODIFICADO", e.FullPath);
         _watcher.Deleted += (s, e) => OnFileChanged?.Invoke("ELIMINADO", e.FullPath);
