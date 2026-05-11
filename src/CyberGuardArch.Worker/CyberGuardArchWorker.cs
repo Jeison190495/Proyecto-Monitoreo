@@ -7,7 +7,8 @@ namespace CyberGuardArch.Worker;
 public class CyberGuardArchWorker(ILogger<CyberGuardArchWorker> logger,
 IOptions<TelegramOptions> telegramOptions,
 INotificationService notificationService,
-IFileMonitorService fileMonitorService) : BackgroundService
+IFileMonitorService fileMonitorService,
+IConfiguration configuration) : BackgroundService
 {
     private readonly TelegramOptions _options = telegramOptions.Value;
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -32,13 +33,19 @@ IFileMonitorService fileMonitorService) : BackgroundService
 
         fileMonitorService.OnFileChanged += async (tipo, ruta) =>
         {
+            List<string> rutasExcluidas = configuration.GetSection("Monitoreo:Exclusiones").Get<List<string>>() ?? new List<string>();
+            if (rutasExcluidas.Any(e => ruta.Contains(e, StringComparison.OrdinalIgnoreCase)))
+            {
+                return; 
+            }
+            
             // Loguear el cambio detectado en plantilla de log sin interpolación para mejor rendimiento
             logger.LogWarning("Cambio detectado Tipo: {Tipo} ,Ruta: {Ruta}, Usuario: {User}, Sistema: {Host}",
                         tipo,
                         ruta,
                         Environment.UserName,
                         Environment.MachineName);
-            
+
             //mensaje de notificación con formato limpio y claro para Telegram
             string mensajenotificacion = $"Alerta de seguridad:\n" +
                                      $"\tAccion: {tipo}\n" +
@@ -51,20 +58,37 @@ IFileMonitorService fileMonitorService) : BackgroundService
         };
 
         // prueba monitoreo a carpeta y subcarpetas
-        string rutaLaboratorio = $"/home/jeison/CyberGuard_Lab";
-
-        try
+        string[] rutas = configuration.GetSection("Monitoreo:Rutas").Get<string[]>() ?? Array.Empty<string>();
+        if (rutas.Length == 0)
         {
-            fileMonitorService.StartMonitoring(rutaLaboratorio);
-            logger.LogInformation($"Vigilando la carpeta: {rutaLaboratorio}");
-        }
-        catch (Exception ex)
-        {
-            logger.LogError($"No se pudo iniciar el monitoreo: {ex.Message}");
+            logger.LogError("No se han configurado rutas para monitorear en appsettings.json");
             return;
         }
 
-        // 4. Mantener el servicio vivo
+        foreach (var ruta in rutas)
+        {
+            try
+            {
+                fileMonitorService.StartMonitoring(ruta);
+                logger.LogInformation("Vigilando la carpeta: {ruta}", ruta);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                logger.LogError("Acceso denegado a la ruta: {ruta}. \nFalta permisos de administrador.", ruta);
+                return;
+            }
+            catch (DirectoryNotFoundException)
+            {
+                logger.LogError("La ruta no existe: {ruta}", ruta);
+                return;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Error al iniciar monitoreo en la ruta: {ruta}: {Mensaje}", ruta, ex.Message);
+                return;
+            }
+        }
+
         await notificationService.SendNotificationAsync($"🛡️ {_options.NameBot} monitoreando archivos...", stoppingToken);
 
         while (!stoppingToken.IsCancellationRequested)

@@ -49,6 +49,11 @@ Este documento detalla las fases de desarrollo, requisitos técnicos y el estado
 ### [ x ] Sensor de Sistema de Archivos (Watcher)
 - [ x ] Monitoreo de directorios clave mediante `FileSystemWatcher` optimizado para Linux.
 - [ x ] Detección de: Creación, Modificación, Eliminación.
+### [x] Sensor de Sistema de Archivos (Watcher):
+- [x] Implementación optimizada de `FileSystemWatcher`.
+- [x] Detección de: Creación, Modificación, Eliminación y Renombrado.
+- [x] **Sistema de Exclusiones:** Filtrado de ruido de sistema (KDE/Dolphin, Wireplumber, caches).
+- [x] **Seguridad:** Monitoreo de cambios en atributos y permisos (`chmod`/`chown`).
 ### [ ] Interfaz de Usuario Local
 - [ ] Alertas visuales usando `notify-send` / `Zenity`.
 

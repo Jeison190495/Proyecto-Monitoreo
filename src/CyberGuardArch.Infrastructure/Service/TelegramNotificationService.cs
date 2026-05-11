@@ -11,16 +11,27 @@ public class TelegramNotificationService(IOptions<TelegramOptions> options) : IN
 
     public async Task SendNotificationAsync(string message, CancellationToken cancellationToken = default)
     {
-        try
+        int maxIntentos = 10;
+        int delayBase = 3000; // 3 segundo
+        for (int i = 0; i < maxIntentos; i++)
         {
-            await _botClient.SendMessage(
-                chatId: options.Value.ChatId, // Acceso directo al parámetro del constructor primario
-                text: message,
-                cancellationToken: cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Error al enviar notificación a Telegram", ex);
+            try
+            {
+                await _botClient.SendMessage(
+                    chatId: options.Value.ChatId, // Acceso directo al parámetro del constructor primario
+                    text: message,
+                    cancellationToken: cancellationToken);
+                return;
+            }
+            catch (Exception ex) when (i < maxIntentos - 1)
+            {
+                await Task.Delay(delayBase, cancellationToken);
+                delayBase *= 2; // Incrementa el tiempo de espera para el próximo intento
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al enviar notificación a Telegram después de varios intentos", ex);
+            }
         }
     }
 }

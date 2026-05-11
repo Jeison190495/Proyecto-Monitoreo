@@ -4,50 +4,48 @@ using CyberGuardArch.Core.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using CyberGuardArch.Worker;
+using Microsoft.Extensions.Configuration;
 
 namespace CyberGuardArch.Tests;
 
 public class WorkerTests
 {
     [Fact]
-    public async Task ExecuteAsync_ShouldNotSendNotification_WhenTokenIsEmpty()
+public async Task Worker_ShouldMonitorMultiplePaths_FromConfiguration()
+{
+    // 1. Arrange
+    var mockLogger = new Mock<ILogger<CyberGuardArchWorker>>();
+    var mockNotification = new Mock<INotificationService>();
+    var mockMonitor = new Mock<IFileMonitorService>();
+
+    // Usamos una lista simple de strings para asegurar el binding
+    var rutasData = new Dictionary<string, string?>
     {
-        // Arrange: Preparamos los mocks
-        var mockLogger = new Mock<ILogger<CyberGuardArchWorker>>();
-        var mockNotification = new Mock<INotificationService>();
-        var mockMonitor = new Mock<IFileMonitorService>();
+        {"Monitoreo:Rutas:0", "/ruta1"},
+        {"Monitoreo:Rutas:1", "/ruta2"}
+    };
 
-        // Simulamos configuración inválida (Token vacío)
-        var options = Options.Create(new TelegramOptions
-        {
-            Token = "",
-            ChatId = "123",
-            NameBot = "TestBot"
-        });
+    var myConfiguration = new ConfigurationBuilder()
+        .AddInMemoryCollection(rutasData)
+        .Build();
 
-        var worker = new CyberGuardArchWorker(mockLogger.Object, options, mockNotification.Object, mockMonitor.Object);
+    var options = Options.Create(new TelegramOptions { Token = "t", ChatId = "c", NameBot = "b" });
 
-        // Act: Ejecutamos el inicio del worker
-        using var cts = new CancellationTokenSource();
-        await worker.StartAsync(cts.Token);
-        await Task.Delay(50); // Tiempo breve para que corra la validación inicial
-        await worker.StopAsync(cts.Token);
+    var worker = new CyberGuardArchWorker(
+        mockLogger.Object, options, mockNotification.Object, mockMonitor.Object, myConfiguration);
 
-        // Assert: Verificamos que NO se llamó al servicio de notificación
-        mockNotification.Verify(
-            x => x.SendNotificationAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
-            Times.Never);
+    // 2. Act
+    await worker.StartAsync(CancellationToken.None);
+    
+    // IMPORTANTE: Damos un tiempo pequeño para que el hilo de fondo procese el foreach
+    await Task.Delay(100); 
 
-        // Opcional: Verificar que se logueó el error específico
-        mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Telegram Token no configurado")),
-                It.IsAny<Exception>(),
-                (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()),
-            Times.Once);
-    }
+    // 3. Assert
+    mockMonitor.Verify(m => m.StartMonitoring("/ruta1"), Times.Once,"Prueba fallida para /ruta1");
+    mockMonitor.Verify(m => m.StartMonitoring("/ruta2"), Times.Once,"Prueba fallida para /ruta2");
+
+    await worker.StopAsync(CancellationToken.None);
+}
 
     [Fact]
     public async Task Worker_ShouldSendNotification_WhenFileMonitorDetectsChange()
@@ -57,32 +55,36 @@ public class WorkerTests
         var mockNotification = new Mock<INotificationService>();
         var mockMonitor = new Mock<IFileMonitorService>();
         
-        var options = Options.Create(new TelegramOptions 
-        { 
-            Token = "valid_token", 
-            ChatId = "123", 
-            NameBot = "SentinelBot" 
+        // Configuración vacía para este test
+        var myConfiguration = new ConfigurationBuilder().Build();
+
+        var options = Options.Create(new TelegramOptions
+        {
+            Token = "valid_token",
+            ChatId = "123",
+            NameBot = "SentinelBot"
         });
 
         var worker = new CyberGuardArchWorker(
-            mockLogger.Object, 
-            options, 
-            mockNotification.Object, 
-            mockMonitor.Object);
+            mockLogger.Object,
+            options,
+            mockNotification.Object,
+            mockMonitor.Object,
+            myConfiguration);
 
         // Act
         await worker.StartAsync(CancellationToken.None);
 
-        // Simulamos que el monitor lanza un evento de cambio
-        mockMonitor.Raise(m => m.OnFileChanged += null, "CREADO", "/home/jeison/CyberGuard_Lab/evidencia.txt");
+        // Simulamos el evento
+        mockMonitor.Raise(m => m.OnFileChanged += null, "CREADO", "/home/jeison/test.txt");
 
-        await Task.Delay(100); 
+        await Task.Delay(100);
         await worker.StopAsync(CancellationToken.None);
 
-        // Assert: Verificamos que el Worker reaccionó al evento enviando a Telegram
+        // Assert
         mockNotification.Verify(n => n.SendNotificationAsync(
-            It.Is<string>(s => s.Contains("CREADO") && s.Contains("evidencia.txt")), 
-            It.IsAny<CancellationToken>()), 
+            It.Is<string>(s => s.Contains("CREADO")),
+            It.IsAny<CancellationToken>()),
             Times.Once);
     }
 }

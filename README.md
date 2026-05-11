@@ -55,3 +55,39 @@ Para validar la integridad de todos los módulos, ejecuta:
 ```bash
 dotnet test
 ```
+### 🔐 Configuración de Auditoría y Secretos (Recomendado)
+
+Para una auditoría de seguridad efectiva en **Arch Linux**, se recomienda monitorear rutas del sistema que manejan privilegios y binarios. Ejecuta los siguientes comandos en la carpeta `src/CyberGuardArch.Worker`:
+
+#### 1. Configuración de Rutas Críticas
+Ejecuta estos comandos para establecer los objetivos de vigilancia:
+```bash
+dotnet user-secrets set "Monitoreo:Rutas:0" "/etc"      # Configuraciones de sistema y passwords
+dotnet user-secrets set "Monitoreo:Rutas:1" "/bin"      # Binarios esenciales
+dotnet user-secrets set "Monitoreo:Rutas:2" "/usr/bin"  # Aplicaciones de usuario
+dotnet user-secrets set "Monitoreo:Rutas:3" "/root"     # Directorio del superusuario
+dotnet user-secrets set "Monitoreo:Rutas:4" "/home"     # Datos de usuario (Requiere filtro de ruido)
+```
+#### 2. Configuración de Excepciones para no tener bucles infinitos
+Para evitar bucles infinitos de logs y falsos positivos generados por el entorno de escritorio (KDE/Dolphin, Caches, etc.), debes añadir la sección Exclusiones en tu archivo appsettings.json
+Nota: El sistema ignorará cualquier cambio en las rutas que contengan estos patrones, optimizando el consumo de CPU y datos.
+```code
+{
+  "Monitoreo": {
+    "Exclusiones": [
+      "/.cache/",
+      "/.config/",
+      "/.local/share/",
+      "/.local/state/",
+      "wireplumber",
+      "CiberGuard_Audit",
+      "/Logs/",
+      ".log",
+      ".tmp",
+      ".lock",
+      "swp",
+      ".git"
+    ]
+  }
+}
+```
