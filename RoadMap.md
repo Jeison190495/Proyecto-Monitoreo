@@ -16,6 +16,7 @@ Este documento detalla las fases de desarrollo, requisitos técnicos y el estado
 ### 🔐 Protocolo de Seguridad e Integridad (Cybersecurity Layer)
 - [ x ] **Gestión de Secretos:** Implementación de `UserSecrets` para desarrollo y variables de entorno para producción (Prohibido Hardcoding de Tokens).
 - [ x ] **Validación de Integridad de Logs:** Diseño de una firma simple para los logs, evitando que un atacante borre huellas de archivos modificados.
+- [ x ] **Criptografia:** Implementación de `Secrets` para la criptografia de los logs.
 - [ ] **Principio de Menor Privilegio:** Definición de permisos mínimos necesarios para que el binario de .NET acceda a `nmcli` y al sistema de archivos sin ser `root` innecesariamente.
 
 ### 📜 Definición de Contratos (Interfaces Core)

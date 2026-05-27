@@ -91,3 +91,9 @@ Nota: El sistema ignorará cualquier cambio en las rutas que contengan estos pat
   }
 }
 ```
+#### 3. Configuración del Secreto Criptográfico
+Para garantizar el blindaje de integridad de los registros mediante `HMAC-SHA256` y evitar la manipulación o borrado silencioso de huellas por parte de un atacante, es obligatorio configurar la clave secreta de firmado:
+
+```bash
+dotnet user-secrets set "Security:LogKey" "Clave"
+```
