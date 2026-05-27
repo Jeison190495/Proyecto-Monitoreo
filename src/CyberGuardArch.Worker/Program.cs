@@ -1,55 +1,52 @@
 using CyberGuardArch.Core.Configuration;
 using CyberGuardArch.Core.Interfaces;
+using CyberGuardArch.Infrastructure.Service;
 using CyberGuardArch.Infrastructure.Services;
 using CyberGuardArch.Worker;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
 
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning) // Filtramos ruido de .NET
-    /*
-    //mostrar el log en archivo log
-    .WriteTo.Console()
-    .WriteTo.File(
-        "Logs/CiberGuard_Auditory.log",
-        rollingInterval: RollingInterval.Day,
-        buffered: false, //dejar en falso para que imprima en tiempo real
-        flushToDiskInterval: TimeSpan.FromSeconds(1), //vacia el buffer cada segundo
-        outputTemplate: "{Timestamp: dd--MM--yyyy HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
-    */
-    .WriteTo.Console(outputTemplate: "{Timestamp: dd/MM/yyyy HH:mm:ss} [{Level}] {Message}{NewLine}{Exception}")  //log en consola 
-    .WriteTo.File(
-        new RenderedCompactJsonFormatter(), // formato actual limpo y estructurado en json para serilog
-        "Logs/CiberGuard_Audit.json", //nombre del archivo de log y su ruta
-        rollingInterval: RollingInterval.Month, //creacion de un nuevo archivo cada mes puede cambiarse por dia 
-        flushToDiskInterval: TimeSpan.FromSeconds(1), //vacia el buffer cada segundo
-        buffered: false //permite que no se pierda el log en caso de un fallo del sistema, se escribe directamente en el archivo sin usar un buffer.
-    )
-    .CreateLogger();
 try
 {
     Log.Information("Iniciando Monitoreo...");
 
     var builder = Host.CreateApplicationBuilder(args);
+    builder.Services.AddSingleton<ILogIntegrityService, HmacLogIntegrityService>();
+    builder.Services.AddSingleton<ForenseLogEnricher>();
+    builder.Services.AddSerilog((services, loggerConfiguration) =>
+        {
+            var enricher = services.GetRequiredService<ForenseLogEnricher>();
+            loggerConfiguration
+            .MinimumLevel.Information()
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+            .Enrich.With(enricher)
+            .WriteTo.Console(outputTemplate: "{Timestamp: dd/MM/yyyy HH:mm:ss} [{Level}] {Message} {NewLine}{Exception}")
+            .WriteTo.File(
+                    new RenderedCompactJsonFormatter(),
+                    "Logs/CiberGuard_Audit.json",
+                    rollingInterval: RollingInterval.Month,
+                    flushToDiskInterval: TimeSpan.FromSeconds(1),
+                    buffered: false
+                );
+        }
+    );
+    Log.Information("Iniciando Monitoreo...");
 
-    builder.Services.AddSerilog();
     builder.Services.Configure<TelegramOptions>(builder.Configuration.GetSection(TelegramOptions.SectionName));
     builder.Services.AddSingleton<INotificationService, TelegramNotificationService>();
-
-    builder.Services.AddHostedService<CyberGuardArchWorker>();
     builder.Services.AddSingleton<IFileMonitorService, LinuxFileMonitorService>();
+    builder.Services.AddHostedService<CyberGuardArchWorker>();
+
 
     var host = builder.Build();
     host.Run();
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "CyberGuardArch Worker terminated unexpectedly");
+    Log.Fatal(ex, "Cerrando con error inesperado");
 }
 finally
 {
     Log.CloseAndFlush();
 }
-
