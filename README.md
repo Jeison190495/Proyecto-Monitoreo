@@ -44,11 +44,11 @@ Actualmente, el sistema ha completado su **Base Forense (Fase 0)** y su **Primer
 
 ### ✅ Funcionalidades Operativas:
 - **Monitoreo de Archivos:** Sensor recursivo que detecta `CREADO`, `MODIFICADO` y `ELIMINADO` en tiempo real.
-- **Notificaciones:** Integración con Telegram Bot API para alertas instantáneas.
-- **Auditoría Forense (Logging):** 
-    - **Humana:** Logs limpios en consola con timestamps locales.
-    - **Máquina:** Logs estructurados en **JSON (formato CLEF)** para futura integración con Dashboards, garantizando persistencia inmediata (`buffered: false`).
-- **Calidad de Software:** Suite de pruebas unitarias con **xUnit** y **Moq** (4/4 tests exitosos).
+- **Sensor de Red Inteligente (Escudo de Red):** Captura sockets de conexión entrante y saliente en tiempo real (`sshd`, `chrome`, etc.). Cuenta con un **Filtro Anti-Spam** integrado que mitiga inundaciones de alertas repetidas en la terminal bajo un esquema de enfriamiento activo y es capaz de registrar escaneos de puertos externos por IPs sospechosas en entornos públicos.
+- **Notificaciones:** Integración asíncrona con Telegram Bot API para el despacho de alertas críticas e instantáneas.
+- **Auditoría Forense (Logging):** - **Humana:** Logs estructurados y enriquecidos en consola con marcas de tiempo legibles y tags de seguridad (`[Filtro de Red]`, `[Auditoría]`).
+    - **Máquina:** Logs persistidos en formato **JSON (CLEF)** con escritura directa a disco sin almacenamiento previo en búfer (`buffered: false`) para garantizar la preservación inmediata de evidencia.
+- **Calidad de Software:** Suite de pruebas unitarias funcionales con **xUnit** y **Moq** (4/4 tests exitosos en el entorno de desarrollo).
 
 ## 🧪 Pruebas del Sistema
 Para validar la integridad de todos los módulos, ejecuta:
@@ -78,17 +78,34 @@ Nota: El sistema ignorará cualquier cambio en las rutas que contengan estos pat
       "/.cache/",
       "/.config/",
       "/.local/share/",
+      "/Logs/",
+      "/tmp/",
       "/.local/state/",
       "wireplumber",
-      "CiberGuard_Audit",
-      "/Logs/",
       ".log",
       ".tmp",
-      ".lock",
+      ".git",
       "swp",
-      ".git"
+      ".lock",
+      "CiberGuard_Audit",
+      ".sqlite",
+      ".sqlite-wal",
+      ".sqlite-shm",
+      ".new"
     ]
-  }
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "EscudoRed": {
+      "VentanaTiempoSegundos": 60,
+      "MaxIntentosPermitidos": 3,
+      "MinutosEnfriamientoAlerta": 5
+    }
+  
 }
 ```
 #### 3. Configuración del Secreto Criptográfico
@@ -97,3 +114,9 @@ Para garantizar el blindaje de integridad de los registros mediante `HMAC-SHA256
 ```bash
 dotnet user-secrets set "Security:LogKey" "Clave"
 ```
+
+### 🧠 Motor de Correlación Forense Avanzada (Nuevo)
+El sistema ya no solo lee cambios en los archivos de historial (`.zsh_history` / `.bash_history`), sino que implementa una heurística de desempate en tiempo real basada en el estado de los procesos del sistema:
+
+* **Detección por Inactividad (*Idle Time*):** Mediante el análisis de sockets activos (`ss`) y el estado de terminales (`who -u`), el sistema discrimina con precisión si un comando provino de la **Consola Física / Local TTY** o de una sesión interactiva remota **Remoto (IP:Port vía SSH)** (ej. desde *Termux*), incluso si ambos operadores están ejecutando comandos de forma simultánea.
+* **Regla de Oro de Cierre:** Interceptación inmediata de señales de destrucción de shell (`exit`/`logout`) asignándolas de manera prioritaria al canal remoto de origen antes de la liberación de sockets TCP.

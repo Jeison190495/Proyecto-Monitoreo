@@ -44,29 +44,33 @@ Este documento detalla las fases de desarrollo, requisitos técnicos y el estado
 ## 🐧 Fase 2: Módulos de Monitoreo (Enfoque Arch Linux)
 *Implementación de los sensores de sistema específicos para Linux.*
 
-### [ ] Sensor de Red (Network Sensor)
-- [ ] Captura de eventos mediante `nmcli` o lectura de `/proc/net/`.
-- [ ] Extracción de metadatos: IP, SSID, Marca de tiempo.
-### [ x ] Sensor de Sistema de Archivos (Watcher)
-- [ x ] Monitoreo de directorios clave mediante `FileSystemWatcher` optimizado para Linux.
-- [ x ] Detección de: Creación, Modificación, Eliminación.
-### [x] Sensor de Sistema de Archivos (Watcher):
-- [x] Implementación optimizada de `FileSystemWatcher`.
-- [x] Detección de: Creación, Modificación, Eliminación y Renombrado.
-- [x] **Sistema de Exclusiones:** Filtrado de ruido de sistema (KDE/Dolphin, Wireplumber, caches).
-- [x] **Seguridad:** Monitoreo de cambios en atributos y permisos (`chmod`/`chown`).
+### [x] Sensor de Red (Network Sensor)
+- [x] **Captura de Sockets Activos:** Identificación automatizada de conexiones entrantes y salientes mediante parsing nativo de utilidades de red (`ss`).
+- [x] **Enriquecimiento de Metadatos:** Extracción en tiempo real de IP origen, puerto local, protocolo de transporte (`tcp`) y mapeo exacto del proceso propietario (`sshd`, `chrome`, etc.).
+- [x] **Filtro Anti-Spam Operativo:** Mecanismo de caché en memoria (`Dictionary`) con ventana de enfriamiento de 5 minutos para mitigar inundaciones por conexiones repetitivas.
+- [x] **Detección de Intrusiones:** Identificación de barridos de puertos externos o intentos fallidos de autenticación por IP de bots automatizados de internet en el puerto SSH (22).
+
+### [x] Sensor de Sistema de Archivos & Auditoría de Terminales (Watcher)
+- [x] **Monitoreo Recursivo de Rutas Críticas:** Vigilancia atómica de eventos `CREADO`, `MODIFICADO` y `ELIMINADO` en `/etc`, `/bin`, `/usr/bin`, `/root` y `/home`.
+- [x] **Sistema Dinámico de Exclusiones:** Filtrado de ruido masivo en segundo plano generado por el entorno gráfico (KDE/Dolphin, buffers `.tmp`, archivos `.lock`, directorios `.cache` y mutaciones de audio de Wireplumber).
+- [x] **Motor de Correlación Forense de Comandos (Hito del Día):**
+  - [x] Raspado asíncrono y en caliente de mutaciones en búferes de historiales de shell (`.zsh_history` / `.bash_history`).
+  - [x] **Algoritmo de Desempate Estricto por Inactividad (*Idle Time*):** Resolución analítica mediante pseudo-terminales virtuales (`who -u`). El motor discrimina con precisión milimétrica si un comando fue ejecutado físicamente en la máquina (`Consola Física / Local TTY`) o de forma remota (`Remoto [IP:Puerto vía SSH]` desde Termux), mitigando el solapamiento o inversión de eventos cuando ambos entornos escriben en paralelo.
+  - [x] **Regla de Interceptación de Salidas:** Priorización de señales de destrucción de shell (`exit`/`logout`) asignándolas instantáneamente al operador remoto antes del cierre del socket TCP.
 ### [ ] Interfaz de Usuario Local
 - [ ] Alertas visuales usando `notify-send` / `Zenity`.
 
 ---
 
 ## 🛡️ Fase 3: Persistencia y Calidad (Forense)
-- [ ] **Logging Industrial:** Implementación de logs estructurados en JSON para fácil parsing.
+- [x] **Logging Industrial:** Implementación de logs estructurados en JSON para fácil parsing.
+- [x] **Blindaje Criptográfico Integrado:** Firmado digital de logs en tiempo real combinando marcas de tiempo, niveles de alerta y rutas mediante cifrado simétrico `HMAC-SHA256` acoplado al módulo de secretos (`Security:LogKey`).
 - [ ] **Daemonization:** Creación del archivo de unidad de `systemd` para que SentinelArch inicie con el sistema.
 - [ ] **Suite de Pruebas:** Cobertura de tests unitarios (XUnit) mínima del 80%.
    - [x] **Lógica de Negocio:** Test de `CyberGuardArchWorker` (Validación de secretos/tokens).
    - [x] **Integración Lógica:** Test de flujo sensor -> notificador (Mocking de eventos).
    - [x] **Cobertura Inicial:** 4/4 Tests exitosos en .NET 10.
+   - [x] **Pruebas de LinuxNetworkMonitorService**
 
 ---
 

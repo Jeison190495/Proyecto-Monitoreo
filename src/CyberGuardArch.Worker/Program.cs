@@ -35,7 +35,9 @@ try
 
     builder.Services.Configure<TelegramOptions>(builder.Configuration.GetSection(TelegramOptions.SectionName));
     builder.Services.AddSingleton<INotificationService, TelegramNotificationService>();
+    builder.Services.AddSingleton<ICommandHistoryService, CommandHistoryService>();
     builder.Services.AddSingleton<IFileMonitorService, LinuxFileMonitorService>();
+    builder.Services.AddSingleton<INetworkMonitorService, LinuxNetworkMonitorService>();
     builder.Services.AddHostedService<CyberGuardArchWorker>();
 
 
